@@ -52,10 +52,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try{
-//            socketConnect("192.9.82.67", 5508);
             if (!sock.isConnected()){
-//                socketConnect("172.16.37.96", 5508);
-                socketConnect("192.9.57.112", 5508);
+                socketConnect("192.9.82.67", 5508);
             }
             while (!sock.isConnected()) {
                 //Wait until sock is connect
@@ -151,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 isReady = true;
-//                Toast.makeText(getApplicationContext(), "Sending...!!!", Toast.LENGTH_LONG).show();
             }
         });
         btn_exit.setOnClickListener(new View.OnClickListener(){
@@ -180,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                     outToServer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
                     inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-                }catch (IOException e){
+                }catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -216,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
                 this.bw.flush();
             }catch (Exception e){
                 e.printStackTrace();
-
             }
             while (true){
                 try{
@@ -245,11 +241,28 @@ public class MainActivity extends AppCompatActivity {
                                         }else if (error.equals("LENGTH")){
                                             error = "Wrong format";
                                         }
-                                        txt_result.setText("Error >> "+error);
+
+                                        final String finalError = error;
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                txt_result.setText("Error >> "+finalError);
+                                            }
+                                        });
                                         Log.d("YSTAG", "error from server : "+error);
+                                        isReady = false;
+                                        break;
                                     }else{
-                                        txt_result.setText("Result>> "+result);
-                                        Log.d("YSTAG", "result from server : "+result);
+                                        final String finalResult = result;
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Log.d("YSTAG", "ASDF");
+                                                txt_result.setText("Result >> "+finalResult);
+                                            }
+                                        });
+                                        isReady = false;
+                                        break;
                                     }
                                 }
                             }catch (Exception e){
@@ -257,7 +270,6 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                         }
-                        isReady = false;
                     }
                 }catch (Exception e){
                     e.printStackTrace();
