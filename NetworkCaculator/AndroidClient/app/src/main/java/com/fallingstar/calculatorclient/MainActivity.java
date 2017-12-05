@@ -154,15 +154,25 @@ public class MainActivity extends AppCompatActivity {
         btn_exit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                try {
-                    sock.close();
-                    thread.interrupt();
-                    outToServer.close();
-                    inFromServer.close();
-                    Toast.makeText(getApplicationContext(), "Disconnected!", Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Thread writeThread = new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        try{
+                            outToServer.write("EXIT");
+                            outToServer.flush();
+                            sock.close();
+                            thread.interrupt();
+                            outToServer.close();
+                            inFromServer.close();
+                        }catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                writeThread.start();
+
+                Toast.makeText(getApplicationContext(), "Disconnected!", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -232,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
                                         result = result_arr[1].trim();
                                         isError = false;
                                     }
-
                                     if (isError){
                                         if (error.equals("ZERO")){
                                             error = "Divided by zero.";
